@@ -13,6 +13,8 @@ import {
   Tags,
   Target,
   Users,
+  Home,
+  Zap,
   ListChecks,
   StickyNote,
   Twitter,
