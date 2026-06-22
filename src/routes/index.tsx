@@ -381,36 +381,66 @@ function Marquee() {
 
 function BuiltFor() {
   const cards = [
-    { title: "The Operator", desc: "Running ops across multiple clients and projects, juggling priorities that change by the hour.", size: "3–8 person team", icon: LayoutDashboard },
-    { title: "The Builder", desc: "Scaling past the founder bottleneck — when memory and stand-ups stop being enough.", size: "8–15 person team", icon: Target },
-    { title: "The Deliverer", desc: "Service teams shipping client work where missed tasks become missed retainers.", size: "Agency / service team", icon: Users },
+    {
+      title: "The Operator",
+      desc: "You're running campaigns, client work, and internal projects simultaneously. You need to see what's on fire and what's on track — without calling a meeting.",
+      size: "3–8 person team",
+      icon: Target,
+    },
+    {
+      title: "The Builder",
+      desc: "You're growing fast. The team doubled in six months and your old system of check-ins and tabs just doesn't scale. You need structure without bureaucracy.",
+      size: "8–15 person team",
+      icon: Home,
+    },
+    {
+      title: "The Deliverer",
+      desc: "Client commitments, internal deadlines, recurring work — it's a lot to track across people. You want one place to see who promised what, and whether it happened.",
+      size: "Agency / service team",
+      icon: Zap,
+    },
   ];
   return (
-    <section id="built-for" style={{ background: "var(--wash)" }} className="border-b border-hairline">
-      <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 sm:py-32">
-        <div className="max-w-3xl">
-          <p className="eyebrow reveal">Built for</p>
-          <h2 className="reveal mt-3 section-h">
-            Founders who need their team to <em className="italic">actually deliver.</em>
-          </h2>
-          <p className="reveal mt-5 max-w-2xl text-[16px] text-sub" style={{ transitionDelay: "0.08s" }}>
-            If you've outgrown spreadsheets, group chats, and the "did you do that thing?" stand-up — you're in the right place.
+    <section
+      id="built-for"
+      className="border-t border-b border-hairline"
+      style={{ background: "#e7f6fc", paddingTop: "clamp(72px,10vw,128px)", paddingBottom: "clamp(72px,10vw,128px)" }}
+    >
+      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+        <div className="grid items-end gap-10 md:grid-cols-2">
+          <div>
+            <p className="eyebrow reveal">Built for</p>
+            <h2
+              className="reveal mt-3"
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontWeight: 400,
+                fontSize: "clamp(36px,4.8vw,68px)",
+                lineHeight: 1.02,
+                letterSpacing: "-0.015em",
+              }}
+            >
+              Founders who need their team to <em className="italic">deliver.</em>
+            </h2>
+          </div>
+          <p className="reveal text-[17px] text-sub md:pb-3" style={{ transitionDelay: "0.08s" }}>
+            Three kinds of leader, one recurring problem: the work is real, but the system holding it together is you. Task Manager 2.0 takes that weight off your shoulders.
           </p>
         </div>
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
+
+        <div className="mt-14 grid gap-5 md:grid-cols-3">
           {cards.map((c, i) => (
             <div
               key={c.title}
-              className="reveal group card-soft p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_30px_60px_-25px_rgba(0,212,255,0.35)]"
+              className="founder-card reveal group"
               style={{ transitionDelay: `${0.08 * i}s` }}
             >
-              <div className="grid h-12 w-12 place-items-center rounded-xl border border-hairline bg-paper transition-transform duration-500 group-hover:[transform:rotateY(180deg)] group-hover:text-[#e76f51]" style={{ color: "var(--accent-deep)" }}>
-                <c.icon className="h-5 w-5" />
+              <div className="founder-icon">
+                <c.icon className="h-[22px] w-[22px]" strokeWidth={1.75} />
               </div>
-              <h3 className="serif mt-6 text-[26px]">{c.title}</h3>
-              <p className="mt-3 text-[15px] text-sub">{c.desc}</p>
-              <span className="mt-6 inline-flex rounded-full border border-hairline bg-paper px-3 py-1 text-[11px] font-medium text-sub">{c.size}</span>
-              <div className="mt-6 h-px w-full bg-hairline transition-all group-hover:bg-[color:var(--accent)]" />
+              <h3 className="serif text-[24px] text-ink">{c.title}</h3>
+              <p className="mt-3 text-[14.5px] leading-relaxed text-sub">{c.desc}</p>
+              <span className="founder-pill mt-6">{c.size}</span>
             </div>
           ))}
         </div>
@@ -418,6 +448,7 @@ function BuiltFor() {
     </section>
   );
 }
+
 
 /* ----------------------------- Coverflow + Comparison ----------------------------- */
 
