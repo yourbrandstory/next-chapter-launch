@@ -1,7 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Check, AlertCircle } from "lucide-react";
-import { getSupabase } from "../lib/supabaseClient";
+
+const WEBHOOK_URL = import.meta.env.VITE_SHEET_WEBHOOK_URL;
+
+async function sendToSheet(payload: Record<string, string>) {
+  if (!WEBHOOK_URL) return;
+  await fetch(WEBHOOK_URL, { method: "POST", body: JSON.stringify(payload) });
+}
 
 export const Route = createFileRoute("/book")({
   component: BookACall,
@@ -64,6 +70,7 @@ function BookACall() {
   const [tools, setTools] = useState<Tool[]>([]);
   const [painPoints, setPainPoints] = useState("");
   const [callTime, setCallTime] = useState<CallTime | null>(null);
+  const [honeypot, setHoneypot] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -87,24 +94,22 @@ function BookACall() {
       return;
     }
 
+    if (honeypot) return;
+
     setSubmitting(true);
     try {
-      const { error } = await getSupabase().from("discovery_requests").insert({
+      await sendToSheet({
         name: name.trim(),
         email: email.trim(),
-        company: company.trim() || null,
-        team_size: teamSize,
-        tools: tools.length > 0 ? tools : null,
-        message: painPoints.trim() || null,
-        best_time: callTime,
+        company: company.trim() || "",
+        teamSize: teamSize || "",
+        tools: tools.join(", "),
+        message: painPoints.trim() || "",
+        bestTime: callTime || "",
       });
-
-      if (error) throw error;
       setSubmitted(true);
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Something went wrong. Please try again.";
-      setSubmitError(message);
+    } catch {
+      setSubmitError("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -195,7 +200,7 @@ function BookACall() {
                 </div>
                 <h2 className="serif mt-6 text-[clamp(1.8rem,3vw,2.4rem)]">Your request is in.</h2>
                 <p className="mt-3 text-[15px] text-sub">
-                  Thanks, {name || "there"} — we'll be in touch within a day…
+                  Thanks, {name.split(" ")[0] || "there"} — we'll be in touch within a day…
                 </p>
                 <div className="mt-8 flex flex-wrap justify-center gap-3">
                   <Link
@@ -219,6 +224,17 @@ function BookACall() {
                 style={{ boxShadow: "0 30px 60px -30px rgba(0,0,0,0.18), 0 8px 20px -10px rgba(0,0,0,0.08)" }}
               >
                 <div className="space-y-6">
+                  {/* Honeypot */}
+                  <input
+                    type="text"
+                    name="company_website"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                    tabIndex={-1}
+                    autoComplete="off"
+                    style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, width: 0 }}
+                    aria-hidden="true"
+                  />
                   {/* Name */}
                   <div>
                     <label htmlFor="book-name" className="block text-[13px] font-semibold text-ink mb-1.5">
