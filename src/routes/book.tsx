@@ -4,9 +4,9 @@ import { ArrowRight, Check, AlertCircle } from "lucide-react";
 
 const WEBHOOK_URL = import.meta.env.VITE_SHEET_WEBHOOK_URL;
 
-async function sendToSheet(payload: Record<string, string>) {
+function sendToSheet(payload: Record<string, string>) {
   if (!WEBHOOK_URL) return;
-  await fetch(WEBHOOK_URL, { method: "POST", body: JSON.stringify(payload) });
+  navigator.sendBeacon(WEBHOOK_URL, new URLSearchParams(payload));
 }
 
 export const Route = createFileRoute("/book")({
@@ -81,7 +81,7 @@ function BookACall() {
     );
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitError(null);
 
@@ -97,22 +97,17 @@ function BookACall() {
     if (honeypot) return;
 
     setSubmitting(true);
-    try {
-      await sendToSheet({
-        name: name.trim(),
-        email: email.trim(),
-        company: company.trim() || "",
-        teamSize: teamSize || "",
-        tools: tools.join(", "),
-        message: painPoints.trim() || "",
-        bestTime: callTime || "",
-      });
-      setSubmitted(true);
-    } catch {
-      setSubmitError("Something went wrong. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
+    sendToSheet({
+      name: name.trim(),
+      email: email.trim(),
+      company: company.trim() || "",
+      teamSize: teamSize || "",
+      tools: tools.join(", "),
+      message: painPoints.trim() || "",
+      bestTime: callTime || "",
+    });
+    setSubmitted(true);
+    setSubmitting(false);
   }
 
   function handleReset() {
