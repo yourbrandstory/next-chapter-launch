@@ -84,6 +84,7 @@
   }
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
   }
   body {
     background-color: var(--color-paper);
@@ -100,7 +101,44 @@
     font-weight: 400;
     letter-spacing: -0.015em;
     line-height: 1.02;
+    text-wrap: pretty;
   }
+}
+
+/* Responsive section padding (mobile-first clamp) */
+@utility section-pad {
+  padding-top: clamp(48px, 9vw, 120px);
+  padding-bottom: clamp(48px, 9vw, 120px);
+}
+@utility section-pad-b {
+  padding-bottom: clamp(48px, 9vw, 120px);
+}
+@utility section-pad-t {
+  padding-top: clamp(48px, 9vw, 120px);
+}
+
+/* Touch targets >= 44px on touch devices */
+@utility touch-btn {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Scrollable table wrapper for mobile */
+@utility table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile nav slide-down panel */
+@utility mobile-nav-open {
+  max-height: 300px;
+  opacity: 1;
+  visibility: visible;
+}
+@utility mobile-nav-closed {
+  max-height: 0;
+  opacity: 0;
+  visibility: hidden;
 }
 
 /* Utilities */
@@ -125,7 +163,7 @@
 }
 @utility eyebrow {
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: clamp(10px, 2vw, 11px);
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;

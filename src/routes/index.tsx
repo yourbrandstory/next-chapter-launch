@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
@@ -181,26 +181,80 @@ function Logo({ light = false }: { light?: boolean }) {
 
 function Nav() {
   const scrolled = useScrolled(12);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleTap(e: MouseEvent) {
+      if (menuOpen && menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleTap);
+    return () => document.removeEventListener("mousedown", handleTap);
+  }, [menuOpen]);
+
+  function closeMenu() {
+    setMenuOpen(false);
+  }
+
   return (
     <header
       className={`sticky top-0 z-50 transition-all duration-300 ${
         scrolled ? "bg-paper/85 backdrop-blur-md border-b border-hairline shadow-[0_8px_24px_-18px_rgba(0,0,0,0.2)]" : "bg-paper/60 backdrop-blur-sm"
       }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
-        <a href="#top" className="shrink-0"><Logo /></a>
-        <nav className="hidden md:flex items-center gap-8 text-[14px] text-sub">
-          <a href="#built-for" className="hover:text-ink transition-colors">Who it's for</a>
-          <a href="#how" className="hover:text-ink transition-colors">How it works</a>
-          <a href="#inside" className="hover:text-ink transition-colors">What you get</a>
-          <a href="#stories" className="hover:text-ink transition-colors">Stories</a>
-        </nav>
-        <a
-          href="mailto:hello@nextchapter.in"
-          className="btn-shimmer inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-[13px] font-medium text-white hover:opacity-90"
+      <div ref={menuRef} className="mx-auto max-w-7xl px-5 py-4 sm:px-8">
+        <div className="flex items-center justify-between">
+          <a href="#top" className="shrink-0"><Logo /></a>
+          <nav className="hidden md:flex items-center gap-8 text-[14px] text-sub">
+            <a href="#built-for" className="hover:text-ink transition-colors">Who it's for</a>
+            <a href="#how" className="hover:text-ink transition-colors">How it works</a>
+            <a href="#inside" className="hover:text-ink transition-colors">What you get</a>
+            <a href="#stories" className="hover:text-ink transition-colors">Stories</a>
+          </nav>
+          <div className="hidden md:block">
+            <Link
+              to="/book"
+              className="btn-shimmer inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-[13px] font-medium text-white hover:opacity-90"
+            >
+              Book discovery call <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+          {/* Hamburger */}
+          <button
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-expanded={menuOpen}
+            aria-label="Toggle navigation menu"
+            className="md:hidden touch-btn grid place-items-center rounded-lg border border-hairline bg-paper px-3 py-2 text-ink"
+          >
+            <span className="flex flex-col gap-1">
+              <span className={`block h-0.5 w-5 bg-current transition-transform duration-200 ${menuOpen ? "translate-y-1.5 rotate-45" : ""}`} />
+              <span className={`block h-0.5 w-5 bg-current transition-opacity duration-200 ${menuOpen ? "opacity-0" : ""}`} />
+              <span className={`block h-0.5 w-5 bg-current transition-transform duration-200 ${menuOpen ? "-translate-y-1.5 -rotate-45" : ""}`} />
+            </span>
+          </button>
+        </div>
+        {/* Mobile slide-down menu */}
+        <div
+          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+            menuOpen ? "mobile-nav-open mt-4" : "mobile-nav-closed"
+          }`}
         >
-          Book discovery call <ArrowRight className="h-3.5 w-3.5" />
-        </a>
+          <nav className="flex flex-col gap-3 border-t border-hairline pt-4 pb-2">
+            <a href="#built-for" onClick={closeMenu} className="rounded-lg px-4 py-3 text-[15px] text-sub hover:bg-alt hover:text-ink transition-colors">Who it's for</a>
+            <a href="#how" onClick={closeMenu} className="rounded-lg px-4 py-3 text-[15px] text-sub hover:bg-alt hover:text-ink transition-colors">How it works</a>
+            <a href="#inside" onClick={closeMenu} className="rounded-lg px-4 py-3 text-[15px] text-sub hover:bg-alt hover:text-ink transition-colors">What you get</a>
+            <a href="#stories" onClick={closeMenu} className="rounded-lg px-4 py-3 text-[15px] text-sub hover:bg-alt hover:text-ink transition-colors">Stories</a>
+            <Link
+              to="/book"
+              onClick={closeMenu}
+              className="btn-shimmer mt-2 flex items-center justify-center gap-2 rounded-full bg-ink px-4 py-3 text-[15px] font-medium text-white hover:opacity-90"
+            >
+              Book discovery call <ArrowRight className="h-4 w-4" />
+            </Link>
+          </nav>
+        </div>
       </div>
     </header>
   );
@@ -282,15 +336,16 @@ function MockDashboard() {
 }
 
 function Hero() {
+  const navigate = useNavigate();
   return (
-    <section id="top" className="relative">
+    <section id="top" className="relative overflow-x-clip">
       <div aria-hidden className="absolute inset-0 dot-grid opacity-60 [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
-      <div aria-hidden className="glow-blob h-[420px] w-[420px] -left-32 top-10 opacity-70" />
-      <div aria-hidden className="glow-blob h-[360px] w-[360px] right-[-100px] top-40 opacity-60" />
+      <div aria-hidden className="glow-blob h-[clamp(240px,50vw,420px)] w-[clamp(240px,50vw,420px)] -left-[clamp(60px,12vw,128px)] top-10 opacity-70" />
+      <div aria-hidden className="glow-blob h-[clamp(200px,40vw,360px)] w-[clamp(200px,40vw,360px)] -right-[clamp(40px,10vw,100px)] top-40 opacity-60" />
 
-      <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 pt-14 pb-24 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pt-20 lg:pb-32">
+      <div className="relative mx-auto grid max-w-7xl items-center gap-8 px-5 pt-14 pb-24 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pt-20 lg:pb-32">
         <div>
-          <span className="reveal inline-flex items-center gap-2 rounded-full border border-hairline bg-paper px-3.5 py-1.5 text-[12px] text-sub">
+          <span className="reveal inline-flex items-center gap-2 rounded-full border border-hairline bg-paper px-3.5 py-1.5 text-[clamp(11px,2.5vw,12px)] text-sub">
             <span className="h-1.5 w-1.5 rounded-full animate-blink" style={{ background: "var(--accent)", boxShadow: "0 0 8px rgba(0,212,255,0.8)" }} />
             Introducing Task Manager 2.0
           </span>
@@ -303,38 +358,39 @@ function Hero() {
               <Squiggle />
             </span>
           </h1>
-          <p className="reveal mt-7 max-w-xl text-[17px] leading-relaxed text-sub" style={{ transitionDelay: "0.08s" }}>
+          <p className="reveal mt-6 max-w-xl text-[clamp(15px,2.2vw,17px)] leading-relaxed text-sub" style={{ transitionDelay: "0.08s" }}>
             A custom-built team management system, designed around the way you actually work —
             not the way some SaaS product assumes you do.
           </p>
-          <div className="reveal mt-8 flex flex-wrap items-center gap-3" style={{ transitionDelay: "0.16s" }}>
+          <div className="reveal mt-6 flex flex-wrap items-center gap-3" style={{ transitionDelay: "0.16s" }}>
             <MagneticButton
-              href="mailto:hello@nextchapter.in"
-              className="btn-shimmer rounded-full bg-ink px-5 py-3 text-[14px] font-medium text-white hover:opacity-90"
+              href="/book"
+              onClick={(e: React.MouseEvent) => { e.preventDefault(); navigate({ to: "/book" }); }}
+              className="btn-shimmer touch-btn inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-[clamp(13px,2vw,14px)] font-medium text-white hover:opacity-90"
             >
               Book your 60-min discovery call <ArrowRight className="h-4 w-4" />
             </MagneticButton>
             <MagneticButton
               href="#how"
-              className="rounded-full border border-hairline bg-paper px-5 py-3 text-[14px] font-medium text-ink hover:border-ink"
+              className="touch-btn inline-flex items-center gap-2 rounded-full border border-hairline bg-paper px-5 py-3 text-[clamp(13px,2vw,14px)] font-medium text-ink hover:border-ink"
             >
               See how it works
             </MagneticButton>
           </div>
-          <p className="reveal mt-5 text-[12px] text-sub" style={{ transitionDelay: "0.24s" }}>
+          <p className="reveal mt-5 text-[clamp(11px,2vw,12px)] text-sub" style={{ transitionDelay: "0.24s" }}>
             No subscription. No learning curve. Built for you, deployed for you.
           </p>
         </div>
 
-        <div className="reveal-scale relative">
-          <div className="absolute -inset-6 -z-10 rounded-[36px]" style={{ background: "radial-gradient(closest-side, rgba(0,212,255,0.18), transparent 70%)" }} />
+        <div className="reveal-scale relative mx-auto w-full max-w-md sm:max-w-none">
+          <div className="absolute -inset-4 sm:-inset-6 -z-10 rounded-[36px]" style={{ background: "radial-gradient(closest-side, rgba(0,212,255,0.18), transparent 70%)" }} />
           <div className="animate-float">
             <MockDashboard />
           </div>
-          <div className="absolute -top-4 -left-4 rounded-full border border-hairline bg-paper px-3 py-1.5 text-[11px] font-medium shadow-soft animate-float-tilt">
+          <div className="absolute -top-3 sm:-top-4 -left-2 sm:-left-4 rounded-full border border-hairline bg-paper px-2.5 py-1.5 text-[clamp(10px,2vw,11px)] font-medium shadow-soft animate-float-tilt whitespace-nowrap">
             ✦ Task Dashboard
           </div>
-          <div className="absolute -right-6 top-24 hidden sm:block card-soft p-3 text-[11px] rotate-[6deg] animate-float">
+          <div className="absolute -right-2 sm:-right-6 top-20 sm:top-24 hidden sm:block card-soft p-2.5 sm:p-3 text-[clamp(10px,2vw,11px)] rotate-[6deg] animate-float">
             <div className="font-semibold mb-1.5">Status legend</div>
             <div className="flex flex-col gap-1 text-sub">
               <span><i className="inline-block h-2 w-2 rounded-full mr-1.5" style={{ background: "var(--accent)" }} />Top priority</span>
@@ -342,9 +398,9 @@ function Hero() {
               <span><i className="inline-block h-2 w-2 rounded-full mr-1.5 bg-amber-500" />Waiting</span>
             </div>
           </div>
-          <div className="absolute -bottom-5 left-6 sm:left-10 rounded-2xl bg-ink px-4 py-3 text-white shadow-soft">
-            <div className="text-[10px] uppercase tracking-widest text-white/60">Productivity</div>
-            <div className="serif text-[22px] leading-none">3× <span style={{ color: "var(--accent)" }}>faster</span></div>
+          <div className="absolute -bottom-4 sm:-bottom-5 left-4 sm:left-10 rounded-2xl bg-ink px-3 py-2.5 sm:px-4 sm:py-3 text-white shadow-soft">
+            <div className="text-[clamp(9px,1.6vw,10px)] uppercase tracking-widest text-white/60">Productivity</div>
+            <div className="serif text-[clamp(18px,3.5vw,22px)] leading-none">3× <span style={{ color: "var(--accent)" }}>faster</span></div>
           </div>
         </div>
       </div>
@@ -428,7 +484,7 @@ function BuiltFor() {
           </p>
         </div>
 
-        <div className="mt-14 grid gap-5 md:grid-cols-3">
+        <div className="mt-10 sm:mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {cards.map((c, i) => (
             <div
               key={c.title}
@@ -438,8 +494,8 @@ function BuiltFor() {
               <div className="founder-icon">
                 <c.icon className="h-[22px] w-[22px]" strokeWidth={1.75} />
               </div>
-              <h3 className="serif text-[24px] text-ink">{c.title}</h3>
-              <p className="mt-3 text-[14.5px] leading-relaxed text-sub">{c.desc}</p>
+              <h3 className="serif text-[clamp(20px,3vw,24px)] text-ink">{c.title}</h3>
+              <p className="mt-3 text-[clamp(14px,2vw,14.5px)] leading-relaxed text-sub">{c.desc}</p>
               <span className="founder-pill mt-6">{c.size}</span>
             </div>
           ))}
@@ -475,10 +531,10 @@ function Coverflow() {
       body: (
         <div className="space-y-2">
           {[1,2,3,4].map(i => (
-            <div key={i} className="flex items-center gap-2 rounded-lg border border-hairline px-2.5 py-2 text-[11px]">
-              <span className="h-3 w-3 rounded border border-hairline" />
+            <div key={i} className="flex items-center gap-2 rounded-lg border border-hairline px-2 py-1.5 text-[clamp(10px,2vw,11px)]">
+              <span className="h-3 w-3 rounded border border-hairline shrink-0" />
               <span className="flex-1 truncate">Task #{i} — client deliverable</span>
-              <span className="rounded-full px-1.5 py-0.5 text-[9px]" style={{ background: "var(--wash)", color: "var(--accent-deep)" }}>Top</span>
+              <span className="shrink-0 rounded-full px-1.5 py-0.5 text-[9px]" style={{ background: "var(--wash)", color: "var(--accent-deep)" }}>Top</span>
             </div>
           ))}
         </div>
@@ -487,10 +543,10 @@ function Coverflow() {
     {
       title: "Sticky Notes Board",
       body: (
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-1.5">
           {["#fff3a8","#cdeefd","#ffd6cc","#dcfce7","#fde2e4","#e0e7ff"].map((c, i) => (
-            <div key={i} className="aspect-square rounded-md p-1.5 text-[9px] leading-tight text-ink/70 shadow" style={{ background: c }}>
-              Note {i+1}: follow up
+            <div key={i} className="aspect-square rounded-md p-1 text-[clamp(8px,1.6vw,9px)] leading-tight text-ink/70 shadow" style={{ background: c }}>
+              Note {i+1}
             </div>
           ))}
         </div>
@@ -499,26 +555,26 @@ function Coverflow() {
     {
       title: "New Task",
       body: (
-        <div className="space-y-2">
-          <div className="rounded-lg border border-hairline px-2.5 py-2 text-[11px] text-sub">Title — Send weekly client report</div>
-          <div className="rounded-lg border border-hairline px-2.5 py-2 text-[11px] text-sub">Assignee — Priya</div>
-          <div className="flex gap-1.5">
+        <div className="space-y-1.5">
+          <div className="rounded-lg border border-hairline px-2 py-1.5 text-[clamp(10px,2vw,11px)] text-sub">Title — Send weekly client report</div>
+          <div className="rounded-lg border border-hairline px-2 py-1.5 text-[clamp(10px,2vw,11px)] text-sub">Assignee — Priya</div>
+          <div className="flex flex-wrap gap-1">
             {["Top","Hero","Imp","Rapid"].map(t => (
-              <span key={t} className="rounded-full border border-hairline px-2 py-0.5 text-[10px]">{t}</span>
+              <span key={t} className="rounded-full border border-hairline px-2 py-0.5 text-[clamp(9px,1.6vw,10px)]">{t}</span>
             ))}
           </div>
-          <div className="rounded-lg bg-ink px-2.5 py-2 text-center text-[11px] text-white">Create task</div>
+          <div className="rounded-lg bg-ink px-2.5 py-2 text-center text-[clamp(10px,2vw,11px)] text-white">Create task</div>
         </div>
       ),
     },
     {
       title: "Task Modal",
       body: (
-        <div className="space-y-2">
-          <div className="serif text-[18px]">Pre-event checklist</div>
-          <div className="text-[11px] text-sub">Assigned to Aarav · Due Fri · Priority Hero</div>
-          <div className="rounded-lg bg-alt p-2 text-[11px] text-sub">"All vendor confirmations to be locked by Wed EOD."</div>
-          <div className="flex items-center justify-between text-[11px] text-sub">
+        <div className="space-y-1.5">
+          <div className="serif text-[clamp(15px,3vw,18px)]">Pre-event checklist</div>
+          <div className="text-[clamp(10px,2vw,11px)] text-sub">Assigned to Aarav · Due Fri · Priority Hero</div>
+          <div className="rounded-lg bg-alt p-1.5 text-[clamp(10px,2vw,11px)] text-sub">"All vendor confirmations to be locked by Wed EOD."</div>
+          <div className="flex items-center justify-between text-[clamp(10px,2vw,11px)] text-sub">
             <span>3 of 7 subtasks done</span>
             <span style={{ color: "var(--accent-deep)" }}>42%</span>
           </div>
@@ -527,33 +583,66 @@ function Coverflow() {
       ),
     },
   ];
-  const [idx, setIdx] = useState(0);
   const n = screens.length;
-  const go = (d: number) => setIdx((i) => (i + d + n) % n);
+  const [idx, setIdx] = useState(0);
+  const [spread, setSpread] = useState(42);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval>>();
+
+  function resetTimer() {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => setIdx((i) => (i + 1) % n), 5600);
+  }
+
+  function go(d: number) { resetTimer(); setIdx((i) => (i + d + n) % n); }
+
+  function jumpTo(i: number) { resetTimer(); setIdx(i); }
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    function update() { setSpread(mq.matches ? 52 : 42); }
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    resetTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, []);
 
   return (
-    <div className="relative">
-      <div className="relative mx-auto h-[380px] w-full max-w-4xl">
+    <div
+      ref={carouselRef}
+      className="relative overflow-x-hidden"
+      onMouseEnter={() => { if (timerRef.current) clearInterval(timerRef.current); }}
+      onMouseLeave={() => { resetTimer(); }}
+    >
+      <div
+        className="relative mx-auto w-full"
+        style={{ height: "clamp(260px, 60vw, 420px)", maxWidth: "min(100%, 900px)" }}
+      >
         {screens.map((s, i) => {
-          const offset = ((i - idx + n) % n + n) % n;
-          const o = offset > n / 2 ? offset - n : offset;
-          const abs = Math.abs(o);
-          const translate = o * 240;
-          const scale = abs === 0 ? 1 : abs === 1 ? 0.82 : 0.66;
-          const blur = abs === 0 ? 0 : abs === 1 ? 1.5 : 4;
-          const opacity = abs >= 2 ? 0 : 1;
-          const z = 10 - abs;
+          const d = ((i - idx + n) % n + n) % n;
+          const ad = Math.min(d, n - d);
+          const sign = d <= n / 2 ? 1 : -1;
+          const dir = sign * ad;
           return (
             <button
               key={i}
-              onClick={() => setIdx(i)}
+              onClick={() => jumpTo(i)}
               aria-label={`Show ${s.title}`}
-              className="absolute left-1/2 top-0 h-[360px] w-[300px] sm:w-[360px] -translate-x-1/2 transition-all duration-500 ease-out cursor-pointer"
+              className="absolute top-1/2 left-1/2"
               style={{
-                transform: `translateX(calc(-50% + ${translate}px)) scale(${scale})`,
-                filter: `blur(${blur}px)`,
-                opacity,
-                zIndex: z,
+                width: "clamp(300px, 60vw, 620px)",
+                height: "clamp(240px, 56vw, 380px)",
+                cursor: ad ? "pointer" : "default",
+                transform: `translate(-50%, -50%) translateX(${dir * spread}%) scale(${Math.max(0.8, 1 - ad * 0.1)})`,
+                filter: ad ? `blur(${ad * 1.1}px)` : "none",
+                opacity: ad ? Math.max(0.5, 0.78 - (ad - 1) * 0.26) : 1,
+                zIndex: 30 - ad * 10,
+                boxShadow: ad ? "0 24px 50px -30px rgba(0,0,0,.4)" : "0 50px 100px -38px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.04)",
+                transition: "transform .6s cubic-bezier(.3,.7,.3,1), filter .6s, opacity .6s",
               }}
             >
               <ScreenCard title={s.title}>{s.body}</ScreenCard>
@@ -562,10 +651,10 @@ function Coverflow() {
         })}
       </div>
       <div className="mt-6 flex justify-center gap-3">
-        <button onClick={() => go(-1)} aria-label="Previous" className="grid h-10 w-10 place-items-center rounded-full border border-hairline bg-paper hover:border-ink">
+        <button onClick={() => go(-1)} aria-label="Previous" className="touch-btn grid h-11 w-11 sm:h-10 sm:w-10 place-items-center rounded-full border border-hairline bg-paper hover:border-ink">
           <ChevronLeft className="h-4 w-4" />
         </button>
-        <button onClick={() => go(1)} aria-label="Next" className="grid h-10 w-10 place-items-center rounded-full border border-hairline bg-paper hover:border-ink">
+        <button onClick={() => go(1)} aria-label="Next" className="touch-btn grid h-11 w-11 sm:h-10 sm:w-10 place-items-center rounded-full border border-hairline bg-paper hover:border-ink">
           <ChevronRight className="h-4 w-4" />
         </button>
       </div>
@@ -590,17 +679,17 @@ function Surgical() {
   ];
   return (
     <section className="bg-alt border-b border-hairline">
-      <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 sm:py-32">
+      <div className="mx-auto max-w-7xl px-5 section-pad sm:px-8">
         <div className="max-w-3xl">
           <p className="eyebrow reveal">From scattered to surgical</p>
           <h2 className="reveal mt-3 section-h">
             The difference one screen <em className="italic">makes.</em>
           </h2>
         </div>
-        <div className="reveal-scale mt-14">
+        <div className="reveal-scale mt-10 sm:mt-14">
           <Coverflow />
         </div>
-        <div className="mt-20 grid gap-6 md:grid-cols-2">
+        <div className="mt-12 sm:mt-20 grid gap-6 sm:grid-cols-2">
           <div className="reveal-left card-soft p-7">
             <div className="eyebrow">Before Task Manager 2.0</div>
             <ul className="mt-5 space-y-3.5">
@@ -649,7 +738,7 @@ function Workstyle() {
   ];
   return (
     <section className="bg-paper border-b border-hairline">
-      <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 sm:py-32">
+      <div className="mx-auto max-w-7xl px-5 section-pad sm:px-8">
         <div className="max-w-3xl">
           <p className="eyebrow reveal">It fits your workstyle</p>
           <h2 className="reveal mt-3 section-h">
@@ -658,13 +747,13 @@ function Workstyle() {
         </div>
         <div className="mt-14 grid gap-px overflow-hidden rounded-[22px] border border-hairline bg-hairline sm:grid-cols-2 lg:grid-cols-3">
           {items.map((it, i) => (
-            <div key={it.title} className="reveal bg-paper p-8 transition-colors hover:bg-alt" style={{ transitionDelay: `${(i % 3) * 0.06}s` }}>
+            <div key={it.title} className="reveal bg-paper p-6 sm:p-8 transition-colors hover:bg-alt" style={{ transitionDelay: `${(i % 3) * 0.06}s` }}>
               <div className="grid h-11 w-11 place-items-center rounded-xl text-white" style={{ background: it.c, boxShadow: `0 8px 24px -10px ${it.c}55` }}>
                 <it.icon className="h-5 w-5" />
               </div>
               <div className="eyebrow mt-6">{it.eb}</div>
-              <h3 className="serif mt-2 text-[26px]">{it.title}</h3>
-              <p className="mt-3 text-[15px] text-sub">{it.desc}</p>
+              <h3 className="serif mt-2 text-[clamp(22px,3.6vw,26px)]">{it.title}</h3>
+              <p className="mt-3 text-[clamp(14px,2vw,15px)] text-sub">{it.desc}</p>
             </div>
           ))}
         </div>
@@ -678,8 +767,8 @@ function Workstyle() {
 function Stats() {
   return (
     <section className="bg-paper border-b border-hairline">
-      <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8">
-        <div className="grid gap-6 md:grid-cols-3">
+      <div className="mx-auto max-w-7xl px-5 section-pad sm:px-8">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard light eyebrow="Task completion visibility" value={<><Counter to={50} suffix="%+" /></>} label="improvement in task completion visibility" percent={70} />
           <StatCard light eyebrow="Team productivity" value={<><Counter to={3} suffix="×" /></>} label="lift in team output, week over week" percent={88} />
           <StatCard eyebrow="Time saved" value={<><Counter to={45} suffix="m" /></>} label="saved daily on check-ins and pings" percent={62} />
@@ -692,7 +781,7 @@ function Stats() {
 function StatCard({ eyebrow, value, label, percent, light = false }: { eyebrow: string; value: React.ReactNode; label: string; percent: number; light?: boolean }) {
   return (
     <div
-      className={`reveal card-soft p-8 ${light ? "" : "bg-ink text-white border-ink"}`}
+      className={`reveal card-soft p-6 sm:p-8 ${light ? "" : "bg-ink text-white border-ink"}`}
       style={!light ? { borderColor: "#111" } : {}}
     >
       <div className={`eyebrow ${light ? "" : "!text-white/50"}`}>{eyebrow}</div>
@@ -721,7 +810,7 @@ function Inside() {
   ];
   return (
     <section id="inside" className="bg-alt border-b border-hairline">
-      <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 sm:py-32">
+      <div className="mx-auto max-w-7xl px-5 section-pad sm:px-8">
         <div className="max-w-3xl">
           <p className="eyebrow reveal">What's inside</p>
           <h2 className="reveal mt-3 section-h">
@@ -730,8 +819,8 @@ function Inside() {
         </div>
 
         {/* Featured: Task Generator */}
-        <div className="reveal-scale mt-14 grid gap-8 overflow-hidden rounded-[22px] border border-hairline bg-paper md:grid-cols-[1.1fr_1fr]">
-          <div className="p-8 sm:p-10">
+        <div className="reveal-scale mt-14 grid gap-8 overflow-hidden rounded-[22px] border border-hairline bg-paper sm:grid-cols-[1.1fr_1fr]">
+          <div className="p-6 sm:p-10">
             <div className="eyebrow">Featured</div>
             <h3 className="serif mt-3 text-[clamp(1.8rem,3vw,2.6rem)]">
               Task Generator 2.0 — <em className="italic">recurring work, on autopilot.</em>
@@ -745,7 +834,7 @@ function Inside() {
               ))}
             </div>
           </div>
-          <div className="relative bg-alt p-8 sm:p-10">
+          <div className="relative bg-alt p-6 sm:p-10">
             <div className="card-soft p-5">
               <div className="eyebrow">Templates</div>
               <div className="mt-4 space-y-2.5">
@@ -766,7 +855,7 @@ function Inside() {
                 ))}
               </div>
             </div>
-            <div className="absolute -bottom-3 right-6 rounded-full bg-ink px-3.5 py-2 text-[11px] font-medium text-white shadow-soft animate-float">
+            <div className="absolute -bottom-3 right-4 sm:right-6 rounded-full bg-ink px-3.5 py-2 text-[11px] font-medium text-white shadow-soft animate-float whitespace-nowrap">
               1 click → assigned
             </div>
           </div>
@@ -802,14 +891,15 @@ function WhyNot() {
   ];
   return (
     <section className="bg-paper border-b border-hairline">
-      <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 sm:py-32">
+      <div className="mx-auto max-w-7xl px-5 section-pad sm:px-8">
         <div className="max-w-3xl">
           <p className="eyebrow reveal">Why not just Asana, Notion or Monday?</p>
           <h2 className="reveal mt-3 section-h">
             SaaS is built for everyone. <em className="italic">This is built for you.</em>
           </h2>
         </div>
-        <div className="reveal-scale mt-12 overflow-hidden rounded-[22px] border border-hairline">
+        <div className="reveal-scale mt-12 table-scroll rounded-[22px]">
+          <div className="min-w-[640px] rounded-[22px] border border-hairline">
           <div className="grid grid-cols-[1.4fr_1fr_1fr] text-[13px]">
             <div className="bg-alt p-4 sm:p-5 eyebrow">What matters</div>
             <div className="bg-alt p-4 sm:p-5 eyebrow text-center">SaaS tools</div>
@@ -827,6 +917,7 @@ function WhyNot() {
                 </div>
               </div>
             ))}
+          </div>
           </div>
         </div>
       </div>
@@ -865,7 +956,7 @@ function Timeline() {
 
   return (
     <section id="how" className="bg-alt border-b border-hairline">
-      <div className="mx-auto max-w-5xl px-5 py-24 sm:px-8 sm:py-32">
+      <div className="mx-auto max-w-5xl px-5 section-pad sm:px-8">
         <div className="max-w-3xl">
           <p className="eyebrow reveal">How it works</p>
           <h2 className="reveal mt-3 section-h">
@@ -896,9 +987,9 @@ function Timeline() {
                 >
                   {s.done ? <Check className="h-3.5 w-3.5" /> : s.n}
                 </span>
-                <div className="card-soft p-6">
-                  <div className="flex items-center justify-between gap-3">
-                    <h3 className="serif text-[24px]">{s.t}</h3>
+                <div className="card-soft p-5 sm:p-6">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h3 className="serif text-[clamp(20px,3.6vw,24px)]">{s.t}</h3>
                     <span className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium" style={{ background: "var(--wash)", color: "var(--accent-deep)" }}>
                       {s.tag}
                     </span>
@@ -939,7 +1030,7 @@ function Testimonials() {
   }, [quotes.length]);
   return (
     <section id="stories" className="bg-alt border-b border-hairline">
-      <div className="mx-auto max-w-5xl px-5 py-24 sm:px-8 sm:py-32 text-center">
+      <div className="mx-auto max-w-5xl px-5 section-pad sm:px-8 text-center">
         <p className="eyebrow reveal">Stories</p>
         <h2 className="reveal mt-3 section-h">
           Leaders who made the <em className="italic">switch.</em>
@@ -962,7 +1053,7 @@ function Testimonials() {
           </div>
 
           <div className="mt-8 flex items-center justify-center gap-3">
-            <button onClick={() => setI((p) => (p - 1 + quotes.length) % quotes.length)} aria-label="Previous testimonial" className="grid h-10 w-10 place-items-center rounded-full border border-hairline bg-paper hover:border-ink">
+            <button onClick={() => setI((p) => (p - 1 + quotes.length) % quotes.length)} aria-label="Previous testimonial" className="touch-btn grid h-11 w-11 sm:h-10 sm:w-10 place-items-center rounded-full border border-hairline bg-paper hover:border-ink">
               <ChevronLeft className="h-4 w-4" />
             </button>
             <div className="flex gap-2">
@@ -979,7 +1070,7 @@ function Testimonials() {
                 />
               ))}
             </div>
-            <button onClick={() => setI((p) => (p + 1) % quotes.length)} aria-label="Next testimonial" className="grid h-10 w-10 place-items-center rounded-full border border-hairline bg-paper hover:border-ink">
+            <button onClick={() => setI((p) => (p + 1) % quotes.length)} aria-label="Next testimonial" className="touch-btn grid h-11 w-11 sm:h-10 sm:w-10 place-items-center rounded-full border border-hairline bg-paper hover:border-ink">
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
@@ -992,10 +1083,11 @@ function Testimonials() {
 /* ----------------------------- Final CTA ----------------------------- */
 
 function FinalCTA() {
+  const navigate = useNavigate();
   return (
     <section className="relative bg-paper overflow-hidden">
       <div aria-hidden className="glow-blob h-[600px] w-[600px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-80" />
-      <div className="relative mx-auto max-w-3xl px-5 py-28 sm:py-36 text-center">
+      <div className="relative mx-auto max-w-3xl px-5 section-pad text-center">
         <span className="reveal inline-flex items-center gap-2 rounded-full border border-hairline bg-paper px-3.5 py-1.5 text-[12px] text-sub">
           <span className="h-1.5 w-1.5 rounded-full animate-blink" style={{ background: "var(--accent)", boxShadow: "0 0 8px rgba(0,212,255,0.8)" }} />
           Your next chapter
@@ -1009,8 +1101,9 @@ function FinalCTA() {
         </p>
         <div className="reveal mt-9 flex justify-center" style={{ transitionDelay: "0.16s" }}>
           <MagneticButton
-            href="mailto:hello@nextchapter.in"
-            className="btn-shimmer rounded-full bg-ink px-6 py-3.5 text-[14px] font-medium text-white"
+            href="/book"
+            onClick={(e: React.MouseEvent) => { e.preventDefault(); navigate({ to: "/book" }); }}
+            className="btn-shimmer touch-btn rounded-full bg-ink px-6 py-3.5 text-[14px] font-medium text-white"
           >
             Book your discovery call <ArrowRight className="h-4 w-4" />
           </MagneticButton>
@@ -1028,7 +1121,7 @@ function FinalCTA() {
 function Footer() {
   return (
     <footer className="bg-ink text-white">
-      <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 grid gap-14 lg:grid-cols-[1.2fr_1fr_1fr]">
+      <div className="mx-auto max-w-7xl px-5 section-pad sm:px-8 grid gap-10 sm:gap-14 sm:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr]">
         <div>
           <Logo light />
           <p className="serif mt-5 max-w-sm text-[22px] leading-snug text-white/85">
@@ -1052,18 +1145,18 @@ function Footer() {
           <p className="mt-3 text-[14px] text-white/70">One short read each month on building systems your team actually uses.</p>
           <form
             onSubmit={(e) => { e.preventDefault(); }}
-            className="mt-5 flex gap-2 rounded-full border border-white/20 bg-white/5 p-1.5"
+            className="mt-5 flex flex-col sm:flex-row gap-2 rounded-2xl sm:rounded-full border border-white/20 bg-white/5 p-3 sm:p-1.5"
           >
             <input
               type="email"
               required
               placeholder="you@company.com"
               aria-label="Email address"
-              className="flex-1 bg-transparent px-4 py-2 text-[14px] text-white placeholder:text-white/40 focus:outline-none"
+              className="w-full sm:flex-1 bg-transparent px-4 py-2.5 sm:py-2 text-[14px] text-white placeholder:text-white/40 focus:outline-none"
             />
             <button
               type="submit"
-              className="btn-shimmer rounded-full px-4 py-2 text-[13px] font-medium text-ink"
+              className="btn-shimmer touch-btn w-full sm:w-auto rounded-full px-4 py-2.5 sm:py-2 text-[13px] font-medium text-ink"
               style={{ background: "var(--accent)", boxShadow: "0 0 24px rgba(0,212,255,0.4)" }}
             >
               Subscribe
