@@ -130,13 +130,10 @@ function BookACall() {
 
     try {
       const supabase = getSupabase();
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("discovery_requests")
-        .insert([payload])
-        .select("id")
-        .single();
+        .insert([payload]);
 
-      console.log("Insert data", data);
       console.log("Insert error", error);
 
       if (error) {
@@ -146,7 +143,7 @@ function BookACall() {
         return;
       }
 
-      console.log("Supabase insert succeeded, id:", data.id);
+      console.log("Supabase insert succeeded");
 
       sendToSheet({
         name: payload.name,
