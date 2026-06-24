@@ -1,13 +1,27 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Check, AlertCircle } from "lucide-react";
+import { getSupabase } from "../lib/supabaseClient";
 
 const WEBHOOK_URL = import.meta.env.VITE_SHEET_WEBHOOK_URL;
 
-function sendToSheet(payload: Record<string, string>) {
-  if (!WEBHOOK_URL) return;
-  const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
-  navigator.sendBeacon(WEBHOOK_URL, blob);
+async function sendToSheet(payload: Record<string, string>) {
+  if (!WEBHOOK_URL) {
+    console.warn("VITE_SHEET_WEBHOOK_URL not set — skipping sheet write");
+    return;
+  }
+  try {
+    console.log("Sending to Google Sheet", WEBHOOK_URL, payload);
+    await fetch(WEBHOOK_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    console.log("Sheet request sent");
+  } catch (err) {
+    console.error("Sheet request failed", err);
+  }
 }
 
 export const Route = createFileRoute("/book")({
@@ -82,7 +96,7 @@ function BookACall() {
     );
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitError(null);
 
@@ -98,17 +112,59 @@ function BookACall() {
     if (honeypot) return;
 
     setSubmitting(true);
-    sendToSheet({
+
+    console.log("SUPABASE_URL", import.meta.env.VITE_SUPABASE_URL);
+    console.log("WEBHOOK_URL", import.meta.env.VITE_SHEET_WEBHOOK_URL);
+
+    const payload = {
       name: name.trim(),
       email: email.trim(),
-      company: company.trim() || "",
-      teamSize: teamSize || "",
-      tools: tools.join(", "),
-      message: painPoints.trim() || "",
-      bestTime: callTime || "",
-    });
-    setSubmitted(true);
-    setSubmitting(false);
+      company: company.trim() || null,
+      team_size: teamSize || null,
+      tools: tools,
+      message: painPoints.trim() || null,
+      best_time: callTime || null,
+    };
+
+    console.log("PAYLOAD", payload);
+
+    try {
+      const supabase = getSupabase();
+      const { data, error } = await supabase
+        .from("discovery_requests")
+        .insert([payload])
+        .select("id")
+        .single();
+
+      console.log("Insert data", data);
+      console.log("Insert error", error);
+
+      if (error) {
+        console.error("Supabase insert error", error);
+        setSubmitError("Something went wrong. Please try again.");
+        setSubmitting(false);
+        return;
+      }
+
+      console.log("Supabase insert succeeded, id:", data.id);
+
+      sendToSheet({
+        name: payload.name,
+        email: payload.email,
+        company: payload.company ?? "",
+        teamSize: payload.team_size ?? "",
+        tools: payload.tools.join(", "),
+        message: payload.message ?? "",
+        bestTime: payload.best_time ?? "",
+      });
+
+      setSubmitted(true);
+      setSubmitting(false);
+    } catch (err) {
+      console.error("Supabase exception", err);
+      setSubmitError("Something went wrong. Please try again.");
+      setSubmitting(false);
+    }
   }
 
   function handleReset() {
