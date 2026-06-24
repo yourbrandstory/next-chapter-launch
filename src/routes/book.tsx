@@ -15,7 +15,7 @@ async function sendToSheet(payload: Record<string, string>) {
     await fetch(WEBHOOK_URL, {
       method: "POST",
       mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "text/plain" },
       body: JSON.stringify(payload),
     });
     console.log("Sheet request sent");
