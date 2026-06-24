@@ -5,23 +5,15 @@ import { getSupabase } from "../lib/supabaseClient";
 
 const WEBHOOK_URL = import.meta.env.VITE_SHEET_WEBHOOK_URL;
 
-async function sendToSheet(payload: Record<string, string>) {
+function sendToSheet(payload: Record<string, string>) {
   if (!WEBHOOK_URL) {
     console.warn("VITE_SHEET_WEBHOOK_URL not set — skipping sheet write");
     return;
   }
-  try {
-    console.log("Sending to Google Sheet", WEBHOOK_URL, payload);
-    await fetch(WEBHOOK_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify(payload),
-    });
-    console.log("Sheet request sent");
-  } catch (err) {
-    console.error("Sheet request failed", err);
-  }
+  const params = new URLSearchParams(payload);
+  const url = `${WEBHOOK_URL}?${params}`;
+  console.log("Sending to Google Sheet", url);
+  new Image().src = url;
 }
 
 export const Route = createFileRoute("/book")({
