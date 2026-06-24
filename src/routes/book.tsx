@@ -6,7 +6,8 @@ const WEBHOOK_URL = import.meta.env.VITE_SHEET_WEBHOOK_URL;
 
 function sendToSheet(payload: Record<string, string>) {
   if (!WEBHOOK_URL) return;
-  navigator.sendBeacon(WEBHOOK_URL, new URLSearchParams(payload));
+  const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+  navigator.sendBeacon(WEBHOOK_URL, blob);
 }
 
 export const Route = createFileRoute("/book")({
