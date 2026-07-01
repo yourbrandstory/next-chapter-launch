@@ -88,7 +88,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         property: "og:description",
         content:
-          "One view. Every task. Your team, moving. A bespoke task manager built for founders who need their team to actually deliver.",
+          "Your team's work, finally in sync.. A bespoke task manager built for founders who need their team to actually deliver.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

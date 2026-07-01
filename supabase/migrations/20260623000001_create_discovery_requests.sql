@@ -42,3 +42,6 @@ CREATE POLICY anon_insert ON public.discovery_requests
   WITH CHECK (true);
 
 -- No public SELECT — reads stay server/admin-only
+
+-- Required: table-level privilege for the anon role (RLS alone is insufficient)
+GRANT INSERT ON public.discovery_requests TO anon;

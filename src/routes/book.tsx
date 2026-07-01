@@ -23,7 +23,7 @@ export const Route = createFileRoute("/book")({
 function useReveal() {
   useEffect(() => {
     const els = document.querySelectorAll<HTMLElement>(
-      ".book-reveal, .book-reveal-left, .book-reveal-right"
+      ".book-reveal, .book-reveal-left, .book-reveal-right",
     );
     const io = new IntersectionObserver(
       (entries) => {
@@ -34,7 +34,7 @@ function useReveal() {
           }
         });
       },
-      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
     );
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
@@ -83,9 +83,7 @@ function BookACall() {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   function toggleTool(tool: Tool) {
-    setTools((prev) =>
-      prev.includes(tool) ? prev.filter((t) => t !== tool) : [...prev, tool]
-    );
+    setTools((prev) => (prev.includes(tool) ? prev.filter((t) => t !== tool) : [...prev, tool]));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -122,9 +120,7 @@ function BookACall() {
 
     try {
       const supabase = getSupabase();
-      const { error } = await supabase
-        .from("discovery_requests")
-        .insert([payload]);
+      const { error } = await supabase.from("discovery_requests").insert([payload]);
 
       console.log("Insert error", error);
 
@@ -178,28 +174,45 @@ function BookACall() {
           <div className="lg:sticky lg:top-28 lg:self-start">
             <div className="book-reveal">
               <span className="inline-flex items-center gap-2 rounded-full border border-hairline bg-paper px-3.5 py-1.5 text-[12px] text-sub">
-                <span className="h-1.5 w-1.5 rounded-full animate-blink" style={{ background: "var(--accent)", boxShadow: "0 0 8px rgba(0,212,255,0.8)" }} />
+                <span
+                  className="h-1.5 w-1.5 rounded-full animate-blink"
+                  style={{ background: "var(--accent)", boxShadow: "0 0 8px rgba(0,212,255,0.8)" }}
+                />
                 Book your discovery call
               </span>
             </div>
 
             <h1 className="book-reveal mt-6 hero-h" style={{ transitionDelay: "0.08s" }}>
-              Let's map your team's{" "}
-              <em className="italic">next chapter.</em>
+              Let's map your team's <em className="italic">next chapter.</em>
             </h1>
 
-            <p className="book-reveal mt-6 max-w-xl text-[17px] leading-relaxed text-sub" style={{ transitionDelay: "0.16s" }}>
-              Tell us a little about your team. We'll reply within a day to schedule
-              a 60-minute call — no pitch deck, just a conversation about how your team
-              works and whether we can help.
+            <p
+              className="book-reveal mt-6 max-w-xl text-[17px] leading-relaxed text-sub"
+              style={{ transitionDelay: "0.16s" }}
+            >
+              Tell us a little about your team. We'll reply within a day to schedule a 60-minute
+              call — no pitch deck, just a conversation about how your team works and whether we can
+              help.
             </p>
 
             <div className="book-reveal mt-10 space-y-6" style={{ transitionDelay: "0.24s" }}>
               <h3 className="eyebrow">What happens next</h3>
               {[
-                { num: "1", title: "You send this over", desc: "Fill out the form and we'll get it on our end." },
-                { num: "2", title: "We reply within a day", desc: "We read every submission personally and reach out to schedule." },
-                { num: "3", title: "We talk, then we build", desc: "A 60-min discovery call to map your workflow. If it's a fit, we build." },
+                {
+                  num: "1",
+                  title: "You send this over",
+                  desc: "Fill out the form and we'll get it on our end.",
+                },
+                {
+                  num: "2",
+                  title: "We reply within a day",
+                  desc: "We read every submission personally and reach out to schedule.",
+                },
+                {
+                  num: "3",
+                  title: "We talk, then we build",
+                  desc: "A 60-min discovery call to map your workflow. If it's a fit, we build.",
+                },
               ].map((step) => (
                 <div key={step.num} className="flex gap-4">
                   <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink text-[13px] font-semibold text-white">
@@ -213,7 +226,10 @@ function BookACall() {
               ))}
             </div>
 
-            <div className="book-reveal mt-10 flex items-center gap-4 rounded-2xl border border-hairline bg-paper px-5 py-4 shadow-soft" style={{ transitionDelay: "0.32s" }}>
+            <div
+              className="book-reveal mt-10 flex items-center gap-4 rounded-2xl border border-hairline bg-paper px-5 py-4 shadow-soft"
+              style={{ transitionDelay: "0.32s" }}
+            >
               <div className="flex -space-x-3">
                 {AVATARS.map((a) => (
                   <div
@@ -236,7 +252,10 @@ function BookACall() {
           <div className="book-reveal-right">
             {submitted ? (
               <div className="card-soft p-6 sm:p-14 text-center">
-                <div className="mx-auto grid h-16 w-16 place-items-center rounded-full" style={{ background: "var(--wash)" }}>
+                <div
+                  className="mx-auto grid h-16 w-16 place-items-center rounded-full"
+                  style={{ background: "var(--wash)" }}
+                >
                   <Check className="h-8 w-8" style={{ color: "var(--accent-deep)" }} />
                 </div>
                 <h2 className="serif mt-6 text-[clamp(1.8rem,3vw,2.4rem)]">Your request is in.</h2>
@@ -262,7 +281,10 @@ function BookACall() {
               <form
                 onSubmit={handleSubmit}
                 className="rounded-[24px] border border-[#eaeaea] bg-paper p-5 sm:p-10 shadow-soft"
-                style={{ boxShadow: "0 30px 60px -30px rgba(0,0,0,0.18), 0 8px 20px -10px rgba(0,0,0,0.08)" }}
+                style={{
+                  boxShadow:
+                    "0 30px 60px -30px rgba(0,0,0,0.18), 0 8px 20px -10px rgba(0,0,0,0.08)",
+                }}
               >
                 <div className="space-y-6">
                   {/* Honeypot */}
@@ -273,12 +295,21 @@ function BookACall() {
                     onChange={(e) => setHoneypot(e.target.value)}
                     tabIndex={-1}
                     autoComplete="off"
-                    style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, width: 0 }}
+                    style={{
+                      position: "absolute",
+                      left: "-9999px",
+                      opacity: 0,
+                      height: 0,
+                      width: 0,
+                    }}
                     aria-hidden="true"
                   />
                   {/* Name */}
                   <div>
-                    <label htmlFor="book-name" className="block text-[13px] font-semibold text-ink mb-1.5">
+                    <label
+                      htmlFor="book-name"
+                      className="block text-[13px] font-semibold text-ink mb-1.5"
+                    >
                       Your name <span className="text-destructive">*</span>
                     </label>
                     <input
@@ -294,7 +325,10 @@ function BookACall() {
 
                   {/* Email */}
                   <div>
-                    <label htmlFor="book-email" className="block text-[13px] font-semibold text-ink mb-1.5">
+                    <label
+                      htmlFor="book-email"
+                      className="block text-[13px] font-semibold text-ink mb-1.5"
+                    >
                       Work email <span className="text-destructive">*</span>
                     </label>
                     <input
@@ -310,7 +344,10 @@ function BookACall() {
 
                   {/* Company */}
                   <div>
-                    <label htmlFor="book-company" className="block text-[13px] font-semibold text-ink mb-1.5">
+                    <label
+                      htmlFor="book-company"
+                      className="block text-[13px] font-semibold text-ink mb-1.5"
+                    >
                       Company / studio
                     </label>
                     <input
@@ -371,7 +408,10 @@ function BookACall() {
 
                   {/* Pain points */}
                   <div>
-                    <label htmlFor="book-pain" className="block text-[13px] font-semibold text-ink mb-1.5">
+                    <label
+                      htmlFor="book-pain"
+                      className="block text-[13px] font-semibold text-ink mb-1.5"
+                    >
                       What's slowing your team down right now?
                     </label>
                     <textarea
@@ -424,7 +464,9 @@ function BookACall() {
                     {submitting ? (
                       <>Sending&hellip;</>
                     ) : (
-                      <>Request my discovery call <ArrowRight className="ml-1 inline h-4 w-4" /></>
+                      <>
+                        Request my discovery call <ArrowRight className="ml-1 inline h-4 w-4" />
+                      </>
                     )}
                   </button>
 
@@ -458,12 +500,17 @@ function Nav({ scrolled }: { scrolled: boolean }) {
               style={{ background: "var(--accent)", boxShadow: "0 0 12px rgba(0,212,255,0.8)" }}
             />
           </span>
-          <span className="serif text-[20px] leading-none text-ink">Next Chapter</span>
+          <div className="flex flex-col gap-[3px]">
+            <span className="serif text-[24px] leading-none text-ink">TeamMap</span>
+            <span
+              className="text-[10.5px] font-medium uppercase tracking-[.14em] leading-none"
+              style={{ color: "#5a5a5a" }}
+            >
+              By Next Chapter
+            </span>
+          </div>
         </Link>
-        <Link
-          to="/"
-          className="text-[14px] text-sub transition-colors hover:text-ink"
-        >
+        <Link to="/" className="text-[14px] text-sub transition-colors hover:text-ink">
           &larr; Back to site
         </Link>
       </div>

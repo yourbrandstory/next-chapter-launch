@@ -1,3 +1,5 @@
+
+
 // Supabase Edge Function — notify-discovery-request
 //
 // When a new discovery request is submitted, send an email to hello@nextchapter.in
